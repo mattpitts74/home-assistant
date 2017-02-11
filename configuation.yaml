@@ -1,0 +1,257 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: The Manwarings
+  # Location required to calculate the time the sun rises and sets
+  latitude: 51.140915
+  longitude: 0.42961710
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 63
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/London
+  
+  customize:
+    light.bedroom:
+      friendly_name: Bedroom Light
+    light.hall:
+      friendly_name: Hall Light
+    switch.bedside_light:
+      friendly_name: Bedside Light  
+      icon: mdi:lamp
+    binary_sensor.motion_sensor_3_1:
+      friendly_name: Hall Motion
+
+
+
+# Enables the frontend
+frontend:
+
+http:
+  # Uncomment this to add a password (recommended!)
+  # api_password: PASSWORD
+  # Uncomment this if you are using SSL or running in Docker etc
+  # base_url: example.duckdns.org:8123
+
+# Checks for available updates
+updater:
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time.
+history:
+
+# View all events in a logbook
+logbook:
+
+# Track the sun
+sun:
+
+# Weather Prediction
+sensor:
+  platform: yr
+
+# Text to speech
+tts:
+  platform: google
+
+
+mqtt:
+  broker: 192.168.0.2
+  port: 1883
+  client_id: home-assistant-1
+  username: pi
+  password: raspberry
+
+# Tellstick
+tellstick:
+  signal_repetitions: 3
+
+# Switch control
+switch:
+  platform: tellstick
+  
+# hue
+light:
+  platform: hue
+  host: 192.168.0.9
+  
+# echo
+emulated_hue:
+  host_ip: 192.168.0.2
+  listen_port: 8300
+  off_maps_to_on_domains:
+    - script
+    - scene
+  expose_by_default: true
+  exposed_domains:
+    - switch
+
+# presense
+device_tracker:
+  - platform: owntracks
+
+    
+################################
+### Automations
+################################
+
+automation:
+- alias: BPL On
+  hide_entity: True
+  trigger:
+    platform: time
+    hours: 6
+    minutes: 00
+    seconds: 0
+  action:
+    - service: switch.turn_on
+      entity_id: switch.coffee_maker
+
+- alias: BPL Off
+  hide_entity: True
+  trigger:
+    platform: time
+    hours: 8
+    minutes: 30
+    seconds: 0
+  action:
+    - service: switch.turn_off
+      entity_id: switch.coffee_maker
+      
+- alias: Turn on hall lights when there is movement
+  hide_entity: True
+  trigger:
+    platform: state
+    entity_id: binary_sensor.motion_sensor_3_1
+    to: 'on'
+  condition:
+    condition: sun
+    after: 'sunset'
+  action:
+    service: homeassistant.turn_on
+    entity_id: script.timed_lamp
+
+- alias: Minimote Button 1 short Press
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      scene_id: 1
+      object_id: aeotec_dsa03202_minimote_3
+  action:
+    service: light.turn_on
+    entity_id: 
+      - light.hall
+      - light.bedroom
+      
+- alias: Minimote Button 1 long Press
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      scene_id: 2
+      object_id: aeotec_dsa03202_minimote_3
+  action:
+    service: light.turn_off
+    entity_id:
+      - light.hall
+      - light.bedroom
+      
+- alias: Minimote Button 2 short Press
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      scene_id: 3
+      object_id: aeotec_dsa03202_minimote_3
+  action:
+    service: switch.turn_on
+    entity_id: 
+      - switch.speaker
+      - switch.bedside_light
+      
+- alias: Minimote Button 2 long Press
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      scene_id: 4
+      object_id: aeotec_dsa03202_minimote_3
+  action:
+    service: switch.turn_off
+    entity_id: 
+      - switch.speaker
+      - switch.bedside_light
+      
+- alias: mqttbutton 1 short press
+  trigger:
+    platform: state
+    entity_id: sensor.scene_controller_11_95
+    state: '1'
+  action:
+    service: switch.turn_on
+    entity_id: switch.coffee_maker
+
+- alias: mqttbutton 1 long press
+  trigger:
+    platform: state
+    entity_id: sensor.scene_controller_11_95
+    state: '5'
+  action:
+    service: switch.turn_off
+    entity_id: switch.coffee_maker
+    
+- alias: mqttbutton 2 long press
+  trigger:
+    platform: state
+    entity_id: sensor.scene_controller_11_95
+    state: '2'
+  action:
+    service: media_player.media_next_track
+    entity_id: media_player.picoreplayerlounge   
+
+
+script:
+  timed_lamp:
+    alias: "Turn on lamp and set timer"
+    sequence:
+      # Cancel ev. old timers
+      - service: script.turn_off
+        data:
+           entity_id: script.timer_off
+      - service: light.turn_on
+        data:
+          entity_id: light.hall
+      # Set new timer
+      - service: script.turn_on
+        data:
+          entity_id: script.timer_off
+
+  timer_off:
+    alias: "Turn off lamp after 5 minutes"
+    sequence:
+      - delay:
+          minutes: 5
+      - service: light.turn_off
+        data:
+          entity_id: light.hall
+
+# mysensors          
+mysensors:
+  gateways:
+    - device: mqtt
+      topic_in_prefix: 'mygateway1-out'
+      topic_out_prefix: 'mygateway1-in'
+  debug: true
+  optimistic: false
+  persistence: true
+  retain: true
+  version: 2.0
+  
+zwave:
+  usb_path: /dev/ttyACM0

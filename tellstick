@@ -1,0 +1,28 @@
+{
+  "devices": [
+    {
+      "id": 1,
+      "name": "Nad Amplifer",
+      "protocol": "arctech",
+      "model": "selflearning-switch",
+      "house": "29425",
+      "unit": "1"
+    },
+    {
+      "id": 2,
+      "name": "bed light",
+      "protocol": "arctech",
+      "model": "selflearning-switch",
+      "house": "29425",
+      "unit": "2"
+    },
+    {
+      "id": 3,
+      "name": "shelf light",
+      "protocol": "arctech",
+      "model": "selflearning-switch",
+      "house": "123456",
+      "unit": "2"
+    }
+  ]
+}

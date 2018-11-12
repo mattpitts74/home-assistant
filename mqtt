@@ -1,0 +1,14 @@
+{
+  "plain": true,
+  "plain_websockets": false,
+  "ssl": false,
+  "ssl_websockets": false,
+  "anonymous": true,
+  "logins": [],
+  "customize": {
+    "active": false,
+    "folder": "mosquitto"
+  },
+  "certfile": "fullchain.pem",
+  "keyfile": "privkey.pem"
+}

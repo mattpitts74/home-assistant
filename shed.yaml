@@ -1,0 +1,39 @@
+esphome:
+  name: shed
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "34b9bc0749dc32d68233c17fcb96d51b"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Shed Fallback Hotspot"
+    password: "PaS7IJbGApAv"
+
+captive_portal:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D1
+      mode: INPUT_PULLUP
+    name: shed_motion
+    device_class: motion
+  - platform: gpio
+    pin:
+      number: D2
+      mode: INPUT_PULLUP
+    name: shed_door
+    device_class: door

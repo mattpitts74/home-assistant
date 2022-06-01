@@ -15,17 +15,30 @@ ota:
 web_server:
   port: 80
 
+switch:
+  - platform: gpio
+    pin: D4
+    name: "Greenhouse_edd_flow_pump"
+
 binary_sensor:
   - platform: gpio
     pin:
       number: D1
       mode: INPUT_PULLUP
-    name: "Float Switch"
+    name: "Tomato Float Sensor"
     filters:
       # Small filter, to debounce the switch
       - delayed_on: 100ms
       - delayed_off: 100ms
-     
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+    name: "Autopot Float Sensor"
+    filters:
+      # Small filter, to debounce the switch
+      - delayed_on: 100ms
+      - delayed_off: 100ms
 
 wifi:
   ssid: !secret wifi_ssid
@@ -37,4 +50,3 @@ wifi:
     password: "vsyKwh8yqkPh"
 
 captive_portal:
-    

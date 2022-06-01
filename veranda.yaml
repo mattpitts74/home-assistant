@@ -31,14 +31,22 @@ captive_portal:
 
 switch:
   - platform: gpio
-    pin: D1
-    name: "Logstore Lights"
+    pin: D6
+    name: "Logstore_lights"
   - platform: gpio
-    pin: D2
+    pin: D7
     name: "Water Butt Pump"
-    
+
 binary_sensor:
   - platform: gpio
-    pin: D5
-    name: "Veranda Motion Sensor"
+    pin:
+      number: D5
+      mode: INPUT_PULLUP
+    name: "Veranda Motion"
     device_class: motion
+  - platform: gpio
+    pin:
+      number: D15
+      mode: INPUT_PULLUP
+    name: "Water Butt Float Switch"
+  

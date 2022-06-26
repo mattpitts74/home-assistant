@@ -1,0 +1,64 @@
+mqtt:
+  host: 192.168.0.149
+  port: 1883
+  topic_prefix: frigate
+  client_id: frigate
+  user: mqtt
+  password: landy90
+  stats_interval: 60
+detectors:
+  coral:
+    type: edgetpu
+    device: usb
+cameras:
+  front:
+    ffmpeg:
+      inputs:
+        - path: rtsp://mattpitts74:Landrover90-@192.168.0.193:554/Streaming/Channels/102?transportmode=mcast&profile=Profile_2
+          roles:
+            - detect
+        - path: rtsp://mattpitts74:Landrover90-@192.168.0.193:554/Streaming/Channels/102?transportmode=mcast&profile=Profile_1
+          roles:
+            - record
+    detect:                 
+      width: 640
+      height: 480
+      fps: 5
+    record:
+      enabled: true
+    objects:
+      track:
+        - person
+    snapshots:
+      enabled: true
+    motion:
+      mask:
+        - 0,480,65,480,68,425,59,374,49,324,44,276,53,241,68,191,110,169,140,147,173,124,197,101,240,81,313,87,408,88,443,63,467,0,403,0,0,0
+  back:
+    ffmpeg:
+      hwaccel_args:
+        - -hwaccel_output_format
+        - yuv420p
+      input_args:
+        - -avoid_negative_ts
+        - make_zero
+      inputs:
+        - path: rtsp://mattpitts74:Landrover90-@192.168.0.50:554/h264Preview_01_sub
+          roles:
+            - detect
+        - path: rtsp://mattpitts74:Landrover90-@192.168.0.50:554/h264Preview_01_main
+          roles:
+            - record
+    detect:                 
+      width: 640
+      height: 480
+      fps: 5
+    record:
+      enabled: true
+    objects:
+      track:
+        - person
+    snapshots:
+      enabled: true
+rtmp:
+  enabled: false
